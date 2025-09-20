@@ -1,0 +1,8 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "SUA_CONNECTION_STRING_DO_STORAGE_ACCOUNT",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "CosmosDbConnectionString": "SUA_CONNECTION_STRING_DO_COSMOS_DB"
+  }
+}
