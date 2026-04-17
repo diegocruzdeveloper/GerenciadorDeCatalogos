@@ -1,37 +1,41 @@
 ```
-# Build artifacts
-*.o
-*.obj
-*.exe
-*.dll
-*.so
-*.a
-*.out
-
 # Dependencies
-packages/
-lib/
-bin/
-obj/
+node_modules/
+
+# Build outputs
+dist/
+build/
+coverage/
+htmlcov/
+
+# Environment variables
+.env
+.env.local
+.env.*
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
 
 # Logs
 *.log
 
-# Environment
-.env
-.env.local
-*.env.*
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 
-# Editors
-.vscode/
-.idea/
-*.userprefs
-*.user
+# Coverage reports
+.coverage
 
 # OS generated files
 .DS_Store
 Thumbs.db
 
-# Local settings
-local.settings.json.bak
+# Package manager lock files (if not needed in frontend project)
+package-lock.json
 ```
