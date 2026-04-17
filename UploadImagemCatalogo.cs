@@ -1,12 +1,10 @@
 using System.IO;
-using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace GerenciadorDeCatalogos.Functions
 {
@@ -15,7 +13,6 @@ namespace GerenciadorDeCatalogos.Functions
         [FunctionName("UploadImagemCatalogo")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "catalogo/upload")] HttpRequest req,
-            [Blob("imagens-catalogo", FileAccess.Write, Connection = "AzureWebJobsStorage")] CloudBlobContainer blobContainer,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request to upload an image.");
@@ -28,19 +25,22 @@ namespace GerenciadorDeCatalogos.Functions
             var file = req.Form.Files[0];
             var fileName = System.Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
 
-            await blobContainer.CreateIfNotExistsAsync();
+            // Salvar em disco local ao invés de Azure Blob Storage
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
+            Directory.CreateDirectory(uploadsFolder);
             
-            CloudBlockBlob cloudBlockBlob = blobContainer.GetBlockBlobReference(fileName);
-            cloudBlockBlob.Properties.ContentType = file.ContentType;
+            var filePath = Path.Combine(uploadsFolder, fileName);
             
-            using (var fileStream = file.OpenReadStream())
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
-                await cloudBlockBlob.UploadFromStreamAsync(fileStream);
+                await file.CopyToAsync(fileStream);
             }
             
-            log.LogInformation($"Arquivo {fileName} salvo com sucesso no container imagens-catalogo.");
+            var imageUrl = $"/uploads/{fileName}";
+            
+            log.LogInformation($"Arquivo {fileName} salvo com sucesso na pasta uploads.");
 
-            return new OkObjectResult(new { url = cloudBlockBlob.Uri.ToString() });
+            return new OkObjectResult(new { url = imageUrl });
         }
     }
 }

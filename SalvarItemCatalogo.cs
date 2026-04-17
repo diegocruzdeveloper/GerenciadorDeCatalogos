@@ -7,6 +7,8 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using MySqlConnector;
+using Dapper;
 
 namespace GerenciadorDeCatalogos.Functions
 {
@@ -15,10 +17,6 @@ namespace GerenciadorDeCatalogos.Functions
         [FunctionName("SalvarItemCatalogo")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "catalogo/item")] HttpRequest req,
-            [CosmosDB(
-                databaseName: "CatalogoDB",
-                containerName: "Itens",
-                ConnectionStringSetting = "CosmosDbConnectionString")] IAsyncCollector<dynamic> documentsOut,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function to save a catalog item.");
@@ -33,7 +31,14 @@ namespace GerenciadorDeCatalogos.Functions
 
             item.Id = System.Guid.NewGuid().ToString();
 
-            await documentsOut.AddAsync(item);
+            var connectionString = Environment.GetEnvironmentVariable("MySqlConnectionString");
+            using var connection = new MySqlConnection(connectionString);
+            await connection.OpenAsync();
+
+            const string sql = @"INSERT INTO Itens (Id, Nome, Descricao, UrlDaImagem, Categoria) 
+                                 VALUES (@Id, @Nome, @Descricao, @UrlDaImagem, @Categoria)";
+            
+            await connection.ExecuteAsync(sql, item);
 
             return new CreatedResult($"/catalogo/item/{item.Id}", item);
         }
