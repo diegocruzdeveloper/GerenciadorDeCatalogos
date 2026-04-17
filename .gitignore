@@ -1,0 +1,37 @@
+```
+# Build artifacts
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.out
+
+# Dependencies
+packages/
+lib/
+bin/
+obj/
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+*.userprefs
+*.user
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Local settings
+local.settings.json.bak
+```
